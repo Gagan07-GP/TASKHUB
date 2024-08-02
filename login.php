@@ -1,37 +1,44 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="login.css">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+<?php
+// Check if the form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Database configuration
+    $server = "localhost";
+    $username = "root";
+    $password = "";
+    $dbname = "ramesh";
 
+    // Create a connection
+    $con = mysqli_connect($server, $username, $password, $dbname);
 
-</head>
-<body>
-   <div class="wrapper">
-       
-    <h1>Login</h1>
-    <form action="save.php" method="post">
+    // Check connection
+    if (!$con) {
+        die("Connection failed: " . mysqli_connect_error());
+    }
 
-    <div class="input-box">
-        <input type="Uname" placeholder="Username"  name="username" required>
-        <i class='bx bxs-user'></i>
-    </div>
+    // Retrieve and sanitize form data
+    $fullname = mysqli_real_escape_string($con, $_POST['fullname']);
+    $email = mysqli_real_escape_string($con, $_POST['email']);
+    $number = mysqli_real_escape_string($con, $_POST['number']);
+    $birthdate = mysqli_real_escape_string($con, $_POST['birthdate']);
+    $gender = mysqli_real_escape_string($con, $_POST['gender']);
 
-    <div class="input-box">
-        <input type="pass"  placeholder="Password" name="password" required>
-        <i class='bx bxs-lock-alt'></i>
-    </div>
-     <div class="lgl">
-    <a href="cook.php" class="btn btn-info lbl" role="button">Login</a>
-</div>
-    <a href="#" class="f-pass">forgot password?</a>
-    </form>
-    </div>
-</body>
-</html> -->
+    // Prepare SQL query to insert data into the gagan table
+    $sql = "INSERT INTO `gagan` (`name`, `email`, `number`, `birthdate`, `gender`) 
+            VALUES ('$fullname', '$email', '$number', '$birthdate', '$gender')";
+
+    // Execute query and check for success
+    if (mysqli_query($con, $sql)) {
+        // Success: Output a JavaScript alert
+        echo "<script>alert('Data submitted successfully');</script>";
+    } else {
+        // Error: Show an error message
+        echo "<script>alert('Error: " . mysqli_error($con) . "');</script>";
+    }
+
+    // Close the connection
+    mysqli_close($con);
+}
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -39,9 +46,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Registration Form</title>
+
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
 
@@ -52,47 +59,46 @@
             font-family: "Poppins", sans-serif;
         }
 
-        form a {
-            text-align: center;
-        }
-
         body {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            background: #f7f7f7;
+            background: #fff;
         }
 
-        .wrapper {
+        .container {
             position: relative;
             max-width: 700px;
             width: 100%;
+            background: #fff;
             padding: 25px;
             border-radius: 8px;
-            background: #fff;
-            /* white background */
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         }
 
-        .wrapper h1 {
+        .container header {
             font-size: 1.5rem;
             color: #333;
             font-weight: 500;
             text-align: center;
         }
 
-        .wrapper form {
+        .container .form {
             margin-top: 30px;
         }
 
-        .input-box {
+        .form .input-box {
             width: 100%;
             margin-top: 20px;
         }
 
-        .input-box input {
+        .input-box label {
+            color: #333;
+        }
+
+        .form :where(.input-box input, .select-box) {
             position: relative;
             height: 50px;
             width: 100%;
@@ -100,7 +106,7 @@
             font-size: 1rem;
             color: #707070;
             margin-top: 8px;
-            border: 1px solid #ddd;
+            border: 1px solid #ccc;
             border-radius: 6px;
             padding: 0 15px;
         }
@@ -109,89 +115,116 @@
             box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
         }
 
-        .lgl {
+        .form .column {
             display: flex;
-            height: 77px;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+            column-gap: 15px;
         }
 
-        .btn {
-            height: 49px;
-            width: 26%;
-            color: #fff;
-            font-size: 1.5rem;
+        .form .gender-box {
+            margin-top: 20px;
+        }
+
+        .gender-box h3 {
+            color: #333;
+            font-size: 1rem;
             font-weight: 400;
+            margin-bottom: 8px;
+        }
+
+        .form :where(.gender-option, .gender) {
+            display: flex;
+            align-items: center;
+            column-gap: 50px;
+            flex-wrap: wrap;
+        }
+
+        .form .gender {
+            column-gap: 5px;
+        }
+
+        .gender input {
+            accent-color: #333;
+        }
+
+        .form :where(.gender input, .gender label) {
+            cursor: pointer;
+        }
+
+        .gender label {
+            color: #333;
+        }
+
+        .form button {
+            height: 55px;
+            width: 100%;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 400;
+            margin-top: 30px;
             border: none;
             cursor: pointer;
             transition: all 0.2s ease;
             background: #333;
-            align-content: center;
-            text-decoration: none;
-            border-radius: 9px;
         }
 
-        .btn:hover {
+        .form button:hover {
             background: #444;
         }
 
-        .f-pass {
-            color: #707070;
-            font-size: 1rem;
-            font-weight: 400;
-            /* text-align:center !important; */
-            /* margin-top: 15px; */
+        @media screen and (max-width: 500px) {
+            .form .column {
+                flex-wrap: wrap;
+            }
+
+            .form :where(.gender-option, .gender) {
+                row-gap: 15px;
+            }
         }
-        /* your existing styles here */
     </style>
 </head>
 
 <body>
-    <div class="wrapper">
-        <h1>Login</h1>
-        <form action="save.php" method="post">
+    <section class="container">
+        <header>Registration Form</header>
+        <form action="" method="post" class="form">
             <div class="input-box">
-                <input type="Uname" placeholder="Username" name="username" required>
+                <label>Full Name</label>
+                <input type="text" placeholder="Enter full name" name="fullname" required>
             </div>
 
             <div class="input-box">
-                <input type="pass" placeholder="Password" name="password" required>
+                <label>Email Address</label>
+                <input type="email" placeholder="Enter email address" name="email" required>
             </div>
 
-            <div class="lgl">
-                <a href="#" class="btn btn-info lbl" role="button" data-toggle="modal" data-target="#loginModal">Login</a>
+            <div class="column">
+                <div class="input-box">
+                    <label>Phone Number</label>
+                    <input type="tel" placeholder="Enter phone number" name="number" required>
+                </div>
+                <div class="input-box">
+                    <label>Birth Date</label>
+                    <input type="date" placeholder="Enter birth date" name="birthdate" required>
+                </div>
             </div>
-            <a style="text-align:center;" href="#" class="f-pass">forgot password</a>
+
+            <div class="gender-box">
+                <h3>Gender</h3>
+                <div class="gender-option">
+                    <div class="gender">
+                        <input type="radio" id="check-male" name="gender" value="Male" checked />
+                        <label for="check-male">Male</label>
+                    </div>
+                    <div class="gender">
+                        <input type="radio" id="check-female" name="gender" value="Female" />
+                        <label for="check-female">Female</label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit">Submit</button>
         </form>
-    </div>
-
-    <!-- Modal -->
-    <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="loginModalLabel">Login</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form action="save.php" method="post">
-                        <div class="input-box">
-                            <input type="Uname" placeholder="Username" name="username" required>
-                        </div>
-
-                        <div class="input-box">
-                            <input type="pass" placeholder="Password" name="password" required>
-                        </div>
-                        <a href="cook.php"><button type="submit" class="btn btn-primary">Login</button></a>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    </section>
 </body>
 
 </html>
