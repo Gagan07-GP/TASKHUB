@@ -5,7 +5,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $server = "localhost";
     $username = "root";
     $password = "";
-    $dbname = "ramesh";
+    $dbname = "gp";
 
     // Create a connection
     $con = mysqli_connect($server, $username, $password, $dbname);
@@ -16,22 +16,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Retrieve and sanitize form data
-    $fullname = mysqli_real_escape_string($con, $_POST['fullname']);
-    $email = mysqli_real_escape_string($con, $_POST['email']);
-    $number = mysqli_real_escape_string($con, $_POST['number']);
-    $birthdate = mysqli_real_escape_string($con, $_POST['birthdate']);
-    $gender = mysqli_real_escape_string($con, $_POST['gender']);
+    $username = mysqli_real_escape_string($con, $_POST['username']);
+    $password = mysqli_real_escape_string($con, $_POST['password']);
+    
+    // Hash the password before saving
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-    // Prepare SQL query to insert data into the gagan table
-    $sql = "INSERT INTO `gagan` (`name`, `email`, `number`, `birthdate`, `gender`) 
-            VALUES ('$fullname', '$email', '$number', '$birthdate', '$gender')";
-
+    // Prepare SQL query to insert data into the login table
+    $sql = "INSERT INTO `login`(`username`, `password`) VALUES ('$username','$hashed_password')";
+    
     // Execute query and check for success
     if (mysqli_query($con, $sql)) {
-        // Success: Output a JavaScript alert
         echo "<script>alert('Data submitted successfully');</script>";
     } else {
-        // Error: Show an error message
         echo "<script>alert('Error: " . mysqli_error($con) . "');</script>";
     }
 
@@ -39,16 +36,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     mysqli_close($con);
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Registration Form</title>
-
+    <title>Login</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
 
@@ -65,40 +62,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             align-items: center;
             justify-content: center;
             padding: 20px;
-            background: #fff;
+            background: #f7f7f7;
         }
 
-        .container {
+        .wrapper {
             position: relative;
             max-width: 700px;
             width: 100%;
-            background: #fff;
             padding: 25px;
             border-radius: 8px;
+            background: #fff;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         }
 
-        .container header {
+        .wrapper h1 {
             font-size: 1.5rem;
             color: #333;
             font-weight: 500;
             text-align: center;
         }
 
-        .container .form {
-            margin-top: 30px;
-        }
-
-        .form .input-box {
+        .input-box {
             width: 100%;
             margin-top: 20px;
         }
 
-        .input-box label {
-            color: #333;
-        }
-
-        .form :where(.input-box input, .select-box) {
+        .input-box input {
             position: relative;
             height: 50px;
             width: 100%;
@@ -106,7 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             font-size: 1rem;
             color: #707070;
             margin-top: 8px;
-            border: 1px solid #ccc;
+            border: 1px solid #ddd;
             border-radius: 6px;
             padding: 0 15px;
         }
@@ -115,116 +104,60 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
         }
 
-        .form .column {
+        .lgl {
             display: flex;
-            column-gap: 15px;
-        }
-
-        .form .gender-box {
-            margin-top: 20px;
-        }
-
-        .gender-box h3 {
-            color: #333;
-            font-size: 1rem;
-            font-weight: 400;
-            margin-bottom: 8px;
-        }
-
-        .form :where(.gender-option, .gender) {
-            display: flex;
+            height: 77px;
+            justify-content: center;
             align-items: center;
-            column-gap: 50px;
-            flex-wrap: wrap;
+            text-align: center;
         }
 
-        .form .gender {
-            column-gap: 5px;
-        }
-
-        .gender input {
-            accent-color: #333;
-        }
-
-        .form :where(.gender input, .gender label) {
-            cursor: pointer;
-        }
-
-        .gender label {
-            color: #333;
-        }
-
-        .form button {
-            height: 55px;
-            width: 100%;
+        .btn {
+            height: 49px;
+            width: 26%;
             color: #fff;
-            font-size: 1rem;
+            font-size: 1.5rem;
             font-weight: 400;
-            margin-top: 30px;
             border: none;
             cursor: pointer;
             transition: all 0.2s ease;
             background: #333;
+            border-radius: 9px;
         }
 
-        .form button:hover {
+        .btn:hover {
             background: #444;
         }
 
-        @media screen and (max-width: 500px) {
-            .form .column {
-                flex-wrap: wrap;
-            }
-
-            .form :where(.gender-option, .gender) {
-                row-gap: 15px;
-            }
+        .f-pass {
+            color: #707070;
+            font-size: 1rem;
+            font-weight: 400;
+            text-align: center;
+            display: block;
+            margin-top: 15px;
         }
     </style>
 </head>
 
 <body>
-    <section class="container">
-        <header>Registration Form</header>
-        <form action="" method="post" class="form">
+    <div class="wrapper">
+        <h1>Login</h1>
+        <form action="" method="post">
             <div class="input-box">
-                <label>Full Name</label>
-                <input type="text" placeholder="Enter full name" name="fullname" required>
+                <input type="text" placeholder="Username" name="username" required>
             </div>
 
             <div class="input-box">
-                <label>Email Address</label>
-                <input type="email" placeholder="Enter email address" name="email" required>
+                <input type="password" placeholder="Password" name="password" required>
             </div>
 
-            <div class="column">
-                <div class="input-box">
-                    <label>Phone Number</label>
-                    <input type="tel" placeholder="Enter phone number" name="number" required>
-                </div>
-                <div class="input-box">
-                    <label>Birth Date</label>
-                    <input type="date" placeholder="Enter birth date" name="birthdate" required>
-                </div>
+            <div class="lgl">
+                <button type="submit" class="btn btn-info">Login</button>
             </div>
-
-            <div class="gender-box">
-                <h3>Gender</h3>
-                <div class="gender-option">
-                    <div class="gender">
-                        <input type="radio" id="check-male" name="gender" value="Male" checked />
-                        <label for="check-male">Male</label>
-                    </div>
-                    <div class="gender">
-                        <input type="radio" id="check-female" name="gender" value="Female" />
-                        <label for="check-female">Female</label>
-                    </div>
-                </div>
-            </div>
-
-            <button type="submit">Submit</button>
+            <a href="#" class="f-pass">Forgot password?</a>
         </form>
-    </section>
+    </div>
 </body>
 
 </html>
