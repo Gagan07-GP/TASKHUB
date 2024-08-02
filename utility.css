@@ -1,0 +1,11 @@
+.just{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.my1{
+    margin:9px auto 20px auto;
+}
+.my2{
+    margin: 7px auto 29px auto;
+}

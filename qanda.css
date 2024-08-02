@@ -1,0 +1,33 @@
+.qa {
+    width: 85%;
+    height: 110vh;
+    background-color: rgba(206, 206, 206, 0.21);
+    margin: 33px;
+    position: relative;
+    left: 15vh;
+    padding: 40px;
+    border-radius: 10px;
+    z-index: -1;
+}
+.ttlc {
+    margin-right: 0px !important;
+  /* margin-top: 14px !important; */
+  position: relative;
+  right: 9px !important;
+}
+.mainaq {
+    margin: 20px;
+}
+
+.faq {
+    width: 70vw;
+    height: 16vh;
+    color: #333;
+    background-color: #dcdcdc;
+    border-radius: 5px;
+    padding: 3px 10px;
+    margin: 17px;
+}
+.qafoot{
+    margin-top: 20px !important;
+}
